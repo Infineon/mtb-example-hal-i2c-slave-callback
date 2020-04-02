@@ -7,7 +7,7 @@
 * Related Document: See Readme.md
 *
 *******************************************************************************
-* (c) 2019, Cypress Semiconductor Corporation. All rights reserved.
+* (c) 2019-2020, Cypress Semiconductor Corporation. All rights reserved.
 *******************************************************************************
 * This software, including source code, documentation and related materials
 * ("Software"), is owned by Cypress Semiconductor Corporation or one of its
@@ -169,12 +169,13 @@ void led_pwm_init(void)
     cy_rslt_t result;
 
     /* Allocate and initialize a TCPWM resource and auto select a clock */
-    result = cyhal_pwm_init(&led_pwm, (cyhal_gpio_t) CYBSP_USER_LED, NULL);
+    result = cyhal_pwm_init_adv(&led_pwm, CYBSP_USER_LED, NC,
+                                CYHAL_PWM_RIGHT_ALIGN, true, 0, false, NULL);
 
     if (result == CY_RSLT_SUCCESS)
     {
         /* Set PWM period and initial pulse width */
-        result = cyhal_pwm_set_period(&led_pwm, \
+        result = cyhal_pwm_set_period(&led_pwm,
                  LED_PERIOD, LED_INIT_PULSEWIDTH);
     }
 
@@ -208,8 +209,8 @@ void i2c_slave_init(void)
     cy_rslt_t result;
 
     /* Allocate and initialize a I2C resource and auto select a clock */
-    result = cyhal_i2c_init(&i2c_slave, (cyhal_gpio_t) CYBSP_I2C_SDA, \
-             (cyhal_gpio_t) CYBSP_I2C_SCL, NULL);
+    result = cyhal_i2c_init(&i2c_slave, CYBSP_I2C_SDA,
+                            CYBSP_I2C_SCL, NULL);
 
     if (result == CY_RSLT_SUCCESS)
     {
@@ -220,14 +221,14 @@ void i2c_slave_init(void)
     if (result == CY_RSLT_SUCCESS)
     {
         /* Configure I2C slave write buffer for I2C master to write into */
-        result = cyhal_i2c_slave_config_read_buff(&i2c_slave, i2c_write_buffer,\
+        result = cyhal_i2c_slave_config_read_buff(&i2c_slave, i2c_write_buffer,
                     SL_WR_BUFFER_SIZE);
     }
 
     if (result == CY_RSLT_SUCCESS)
     {
         /* Configure I2C slave read buffer for I2C master to read from */
-        result = cyhal_i2c_slave_config_write_buff(&i2c_slave, i2c_read_buffer,\
+        result = cyhal_i2c_slave_config_write_buff(&i2c_slave, i2c_read_buffer,
                   SL_RD_BUFFER_SIZE);
     }
 
@@ -235,11 +236,11 @@ void i2c_slave_init(void)
     if (result != CY_RSLT_SUCCESS) handle_error();
 
     /* Register I2C slave event callback */
-    cyhal_i2c_register_callback(&i2c_slave, \
+    cyhal_i2c_register_callback(&i2c_slave,
                     (cyhal_i2c_event_callback_t) handle_i2c_slave_events, NULL);
 
     /* Enable events */
-    cyhal_i2c_enable_event(&i2c_slave, (cyhal_i2c_event_t)   \
+    cyhal_i2c_enable_event(&i2c_slave, (cyhal_i2c_event_t)
                              (CYHAL_I2C_SLAVE_WR_CMPLT_EVENT \
                             | CYHAL_I2C_SLAVE_RD_CMPLT_EVENT \
                             | CYHAL_I2C_SLAVE_ERR_EVENT),    \
@@ -288,7 +289,7 @@ void handle_i2c_slave_events(void *callback_arg, cyhal_i2c_event_t event)
          }
 
          /* Configure write buffer for the next write */
-         cyhal_i2c_slave_config_read_buff(&i2c_slave, i2c_write_buffer, \
+         cyhal_i2c_slave_config_read_buff(&i2c_slave, i2c_write_buffer,
                                            SL_WR_BUFFER_SIZE);
      }
 
@@ -297,7 +298,7 @@ void handle_i2c_slave_events(void *callback_arg, cyhal_i2c_event_t event)
      {
          /* Configure read buffer for the next read */
          i2c_read_buffer[PACKET_STS_POS] = STS_CMD_FAIL;
-         cyhal_i2c_slave_config_write_buff(&i2c_slave, i2c_read_buffer, \
+         cyhal_i2c_slave_config_write_buff(&i2c_slave, i2c_read_buffer,
                                             SL_RD_BUFFER_SIZE);
      }
 }
@@ -318,8 +319,8 @@ void handle_i2c_slave_events(void *callback_arg, cyhal_i2c_event_t event)
 void execute_command(void)
 {
     /* Sets the pulse width to control the brightness of the LED. */
-    cyhal_pwm_set_period(&led_pwm, LED_PERIOD, \
-                         (LED_PERIOD - i2c_write_buffer[PACKET_LED_POS]));
+    cyhal_pwm_set_period(&led_pwm, LED_PERIOD,
+                         (i2c_write_buffer[PACKET_LED_POS]));
 }
 
 /*******************************************************************************
