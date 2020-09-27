@@ -138,7 +138,7 @@ int main(void)
     /* Enable global interrupts */
     __enable_irq();
 
-    for(;;)
+    for (;;)
     {
         /* If error is detected in I2C slave operation, handle the error */
         if (error_detected == true)
@@ -146,8 +146,6 @@ int main(void)
             handle_error();
         }
     }
-
-    return (0);
 }
 
 /*******************************************************************************

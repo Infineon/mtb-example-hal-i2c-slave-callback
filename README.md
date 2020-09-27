@@ -1,125 +1,150 @@
 # PSoC 6 MCU: I2C Slave Using Callbacks
 
-This example demonstrates the operation of the I2C (HAL) resource for PSoC® 6 MCU in Slave mode using callbacks.
+This code example demonstrates the operation of the I2C (HAL) resource for PSoC® 6 MCU in Slave mode using callbacks.
 
 ## Requirements
 
-- [ModusToolbox™ software](https://www.cypress.com/products/modustoolbox-software-environment) v2.1
-- Programming Language: C
+- [ModusToolbox® software](https://www.cypress.com/products/modustoolbox-software-environment) v2.2  
+
+    **Note:** This code example version requires ModusToolbox software version 2.2 or later and is not backward compatible with v2.1 or older versions. If you cannot move to ModusToolbox v2.2, use the latest compatible version of this example: [latest-v1.X](https://github.com/cypresssemiconductorco/mtb-example-psoc6-i2c-slave-callback/tree/latest-v1.X).
+- Board Support Package (BSP) minimum required version: 2.0.0  
+- Programming Language: C  
 - Associated Parts: All [PSoC® 6 MCU](http://www.cypress.com/PSoC6) parts
 
-## Supported Kits
+## Supported Toolchains (make variable 'TOOLCHAIN')
 
-- [PSoC 6 Wi-Fi BT Prototyping Kit](https://www.cypress.com/CY8CPROTO-062-4343W) (CY8CPROTO-062-4343W) - Default target
-- [PSoC 6 WiFi-BT Pioneer Kit](https://www.cypress.com/CY8CKIT-062-WIFI-BT) (CY8CKIT-062-WIFI-BT)
+- GNU Arm® Embedded Compiler v9.3.1 (GCC_ARM) - Default value of `TOOLCHAIN`
+- Arm compiler v6.11 (ARM)
+- IAR C/C++ compiler v8.42.2 (IAR)
+
+## Supported Kits (make variable 'TARGET')
+
+- [PSoC 6 Wi-Fi BT Prototyping Kit](https://www.cypress.com/CY8CPROTO-062-4343W) (CY8CPROTO-062-4343W) - Default value of `TARGET`
+- [PSoC 6 WiFi-BT Pioneer Kit](https://www.cypress.com/CY8CKIT-062-WiFi-BT) (CY8CKIT-062-WIFI-BT)
 - [PSoC 6 BLE Pioneer Kit](https://www.cypress.com/CY8CKIT-062-BLE) (CY8CKIT-062-BLE)
 - [PSoC 6 BLE Prototyping Kit](https://www.cypress.com/CY8CPROTO-063-BLE) (CY8CPROTO-063-BLE)
 - [PSoC 62S2 Wi-Fi BT Pioneer Kit](https://www.cypress.com/CY8CKIT-062S2-43012) (CY8CKIT-062S2-43012)
 - [PSoC 62S1 Wi-Fi BT Pioneer Kit](https://www.cypress.com/CYW9P62S1-43438EVB-01) (CYW9P62S1-43438EVB-01)
 - [PSoC 62S1 Wi-Fi BT Pioneer Kit](https://www.cypress.com/CYW9P62S1-43012EVB-01) (CYW9P62S1-43012EVB-01)
 - [PSoC 62S3 Wi-Fi BT Prototyping Kit](https://www.cypress.com/CY8CPROTO-062S3-4343W) (CY8CPROTO-062S3-4343W)
+- [PSoC 64 Secure Boot Wi-Fi BT Pioneer Kit](http://www.cypress.com/CY8CKIT-064B0S2-4343W) (CY8CKIT-064B0S2-4343W)
 
 ## Hardware Setup
 
 This example uses the board's default configuration. See the kit user guide to ensure that the board is configured correctly.
 
-**Note**: The PSoC 6 BLE Pioneer Kit and the PSoC 6 WiFi-BT Pioneer Kit ship with KitProg2 installed. ModusToolbox software requires KitProg3. Before using this code example, make sure that the board is upgraded to KitProg3. The tool and instructions are available in the [Firmware Loader](https://github.com/cypresssemiconductorco/Firmware-loader) GitHub repository. If you do not upgrade, you will see an error like "unable to find CMSIS-DAP device" or "KitProg firmware is out of date".
+**Note:** The PSoC 6 BLE Pioneer Kit (CY8CKIT-062-BLE) and the PSoC 6 WiFi-BT Pioneer Kit (CY8CKIT-062-WIFI-BT) ship with KitProg2 installed. The ModusToolbox software requires KitProg3. Before using this code example, make sure that the board is upgraded to KitProg3. The tool and instructions are available in the [Firmware Loader](https://github.com/cypresssemiconductorco/Firmware-loader) GitHub repository. If you do not upgrade, you will see an error like "unable to find CMSIS-DAP device" or "KitProg firmware is out of date".
 
 ## Software Setup
 
-This section describes how to set up the  **Bridge Control Panel** (BCP) software for transmitting and receiving data over I2C.
+This code example uses the **Bridge Control Panel** (BCP) software for transmitting and receiving data over I2C. The BCP software is installed automatically as part of the [PSoC Programmer](http://www.cypress.com/psocprogrammer) installation. 
 
-The BCP software is installed automatically as part of the [PSoC Programmer](http://www.cypress.com/psocprogrammer) installation. Follow these steps to configure BCP:
+Do the following to configure BCP:
 
 1.  Open BCP from **Start** > **All Programs** > **Cypress** > **Bridge Control Panel** > **Bridge Control Panel**.
 
-2.  Select **KitProg3** under **Connected I2C/SPI/RX8 Ports** (see [Figure 1]()). Note that the PSoC 6 Kit must be connected to the USB port of your computer.
+2.  Select **KitProg3** under **Connected I2C/SPI/RX8 Ports** (see Figure 1). Note that the PSoC 6 Kit must be connected to the USB port of your computer.
 
-##### Figure 1. Bridge Control Panel
+    **Figure 1. Bridge Control Panel**
 
-![Figure 1](images/Figure1.png)
+    ![Figure 1](images/figure1.png)
 
 3.  Select **Tools** \> **Protocol Configuration**, navigate to the **I2C** tab, and set the **I2C speed** to **100 kHz**. Click **OK**. BCP is now ready for transmitting and receiving data.
 
-##### Figure 2. Protocol Configuration
-![Figure2](images/Figure2.png)
+    **Figure 2. Protocol Configuration**
+
+    ![Figure2](images/figure2.png)
 
 ## Using the Code Example
 
 ### In Eclipse IDE for ModusToolbox:
 
-1. Click the **New Application** link in the Quick Panel (or, use **File** > **New** > **ModusToolbox Application**).
+1. Click the **New Application** link in the **Quick Panel** (or, use **File** > **New** > **ModusToolbox Application**). This launches the [Project Creator](http://www.cypress.com/ModusToolboxProjectCreator) tool.
 
 2. Pick a kit supported by the code example from the list shown in the **Project Creator - Choose Board Support Package (BSP)** dialog.
 
-   When you select a supported kit, the example is reconfigured automatically to work with the kit. To work with a different supported kit later, use the **Library Manager** to choose the BSP for the supported kit. You can use the Library Manager to select or update the BSP and firmware libraries used in this application. To access the Library Manager, right-click the application name from the Project Workspace window in the IDE, and select **ModusToolbox** > **Library Manager**.
+   When you select a supported kit, the example is reconfigured automatically to work with the kit. To work with a different supported kit later, use the [Library Manager](https://www.cypress.com/ModusToolboxLibraryManager) to choose the BSP for the supported kit. You can use the Library Manager to select or update the BSP and firmware libraries used in this application. To access the Library Manager, click the link from the Quick Panel. 
 
    You can also just start the application creation process again and select a different kit.
 
-   If you want to use the application for a kit not listed here, you may need to update source files. If the kit does not have the required resources, the application may not work.
+   If you want to use the application for a kit not listed here, you may need to update the source files. If the kit does not have the required resources, the application may not work.
 
-3. In the **Project Creator - Choose Board Support Package (BSP)** dialog, choose the example.
+3. In the **Project Creator - Select Application** dialog, choose the example by enabling the checkbox.
 
-4. Optionally, update the **Application Name:** and **Location** fields with the application name and local path where application is created.
+4. Optionally, change the suggested **New Application Name**.
 
-5. Click **Create** and complete the application creation process.
+5. Enter the local path in the **Application(s) Root Path** field to indicate where the application needs to be created. 
 
-For more details, see the Eclipse IDE for ModusToolbox User Guide: *{ModusToolbox install directory}/ide_{version}/docs/mt_ide_user_guide.pdf*.
+   Applications that can share libraries can be placed in the same root path.
+
+6. Click **Create** to complete the application creation process.
+
+For more details, see the [Eclipse IDE for ModusToolbox User Guide](https://www.cypress.com/MTBEclipseIDEUserGuide) (locally available at *{ModusToolbox install directory}/ide_{version}/docs/mt_ide_user_guide.pdf*).
 
 ### In Command-line Interface (CLI):
 
+ModusToolbox provides the Project Creator as both a GUI tool and a command line tool to easily create one or more ModusToolbox applications. See the "Project Creator Tools" section of the [ModusToolbox User Guide](https://www.cypress.com/ModusToolboxUserGuide) for more details.
+
+Alternatively, you can manually create the application using the following steps.
+
 1. Download and unzip this repository onto your local machine, or clone the repository.
 
-2. Open a CLI terminal and navigate to the application folder. On Linux and macOS, you can use any terminal application. On Windows, navigate to the modus-shell directory (*{ModusToolbox install directory}/tools_\<version>/modus-shell*) and run Cygwin.bat.
+2. Open a CLI terminal and navigate to the application folder.
 
-3. Import required libraries by executing the `make getlibs` command.
+   On Linux and macOS, you can use any terminal application. On Windows, open the **modus-shell** app from the Start menu.
+
+   **Note:** The cloned application contains a default BSP file (*TARGET_xxx.mtb*) in the *deps* folder. Use the [Library Manager](https://www.cypress.com/ModusToolboxLibraryManager) (`make modlibs` command) to select and download a different BSP file, if required. If the selected kit does not have the required resources or is not [supported](#supported-kits-make-variable-target), the application may not work. 
+
+3. Import the required libraries by executing the `make getlibs` command.
+
+Various CLI tools include a `-h` option that prints help information to the terminal screen about that tool. For more details, see the [ModusToolbox User Guide](https://www.cypress.com/ModusToolboxUserGuide) (locally available at *{ModusToolbox install directory}/docs_{version}/mtb_user_guide.pdf*).
 
 ### In Third-party IDEs:
 
-1. Follow instructions from the CLI section to download or clone the repository, and import libraries using `make getlibs` command.
+1. Follow the instructions from the [CLI](#in-command-line-interface-cli) section to create the application, and import the libraries using the `make getlibs` command.
 
 2. Export the application to a supported IDE using the `make <ide>` command.
 
-3. Follow instructions displayed in the terminal to create or import the application as an IDE project.
+    For a list of supported IDEs and more details, see the "Exporting to IDEs" section of the [ModusToolbox User Guide](https://www.cypress.com/ModusToolboxUserGuide) (locally available at *{ModusToolbox install directory}/docs_{version}/mtb_user_guide.pdf*.
 
-For more details, see *Exporting to IDEs* section of the ModusToolbox User Guide: *{ModusToolbox install directory}/ide_{version}/docs/mtb_user_guide.pdf*.
+3. Follow the instructions displayed in the terminal to create or import the application as an IDE project.
 
 ## Operation
 
+If using a PSoC 64 Secure MCU kit (like CY8CKIT-064B0S2-4343W), the PSoC 64 Secure MCU must be provisioned with keys and policies before being programmed. Follow the instructions in the [Secure Boot SDK User Guide](https://www.cypress.com/documentation/software-and-drivers/psoc-64-secure-mcu-secure-boot-sdk-user-guide) to provision the device. If the kit is already provisioned, copy-paste the keys and policy folder to the application folder.
+
 The I2C resource in Slave mode accepts command packets to control the intensity of an LED. The I2C Slave updates its read buffer with a status packet in response to the accepted command.
 
-In this example, a host PC running Cypress’ Bridge Control Panel (BCP) software is used as the I2C Master. LED control is implemented using a TCPWM resource (configured as PWM). The intensity of the LED is controlled by changing the duty cycle of the PWM signal.  
+In this example, a host PC running Cypress’ Bridge Control Panel (BCP) software is used as the I2C master. LED control is implemented using a TCPWM resource (configured as PWM). The intensity of the LED is controlled by changing the duty cycle of the PWM signal.  
 
-1. Connect the board to your PC using the provided USB cable through the USB connector.
+1. Connect the board to your PC using the provided USB cable through the KitProg3 USB connector.
 
 2. Program the board. 
 
-   ### Using Eclipse IDE for ModusToolbox:
+   - **Using Eclipse IDE for ModusToolbox:**
 
-   1. Select the application project in the Project Explorer.
+      1. Select the application project in the Project Explorer.
 
-   2. In the **Quick Panel**, scroll down, and click **\<Application Name> Program (KitProg3)**.
+      2. In the **Quick Panel**, scroll down, and click **\<Application Name> Program (KitProg3_MiniProg4)**.
 
-   ### Using CLI:
+   - **Using CLI:**
 
-   1. From the terminal, execute the `make program` command to build and program the application using the default toolchain to the default target. You can specify a target and toolchain manually:
-        ```
-        make program TARGET=<BSP> TOOLCHAIN=<toolchain>
-        ```
-        Example: 
-   
-        ```
-        make program TARGET=CY8CPROTO-062-4343W TOOLCHAIN=GCC_ARM
-        ```
-        **Note**:  Before building the application, ensure that the *deps* folder contains the BSP file (*TARGET_xxx.lib*) corresponding to the TARGET. Execute the `make getlibs` command to fetch the BSP contents before building the application.
+     From the terminal, execute the `make program` command to build and program the application using the default toolchain to the default target. You can specify a target and toolchain manually:
+      ```
+      make program TARGET=<BSP> TOOLCHAIN=<toolchain>
+      ```
 
-        After programming, the application starts automatically.
+      Example:
+      ```
+      make program TARGET=CY8CPROTO-062-4343W TOOLCHAIN=GCC_ARM
+      ```
+    After programming, the application starts automatically.
 
 3.  Configure the BCP software as described in [Software Setup](#software-setup).
 
 4.  In the **Editor** tab of BCP, type the command to send the LED intensity data, and then click **Send**. Observe that the LED turns ON with the specified intensity.
 
-    The command format that is used to write the data to the Slave if BCP is used as the I2C Master is shown below. The symbol ‘SoP’ means ‘start of packet’ and ‘EoP’ means ‘end of packet’.
+    The command format that is used to write the data to the slave if BCP is used as the I2C master is shown below. The symbol ‘SoP’ means ‘start of packet’ and ‘EoP’ means ‘end of packet’.
 
     | Start for Write | Slave Address | SoP  | LED TCPWM Compare Value | EoP  | Stop |
     |-----------------|---------------|------|-------------------------|------|------|
@@ -129,38 +154,40 @@ In this example, a host PC running Cypress’ Bridge Control Panel (BCP) softwar
 
 5.  Type the command `r 08 x x x p` to read the status of the write performed.
 
-    The following is the command format to read the status form the Slave’s read buffer. The symbol ‘x’ denotes one byte to read from the Slave’s read buffer. In this example, three bytes are read from the Slave.
+    The following is the command format to read the status form the slave’s read buffer. The symbol ‘x’ denotes one byte to read from the slave’s read buffer. In this example, three bytes are read from the slave.
 
     | Start for Read | Slave Address | SoP | LED TCPWM Compare Value | EoP | Stop |
     |----------------|---------------|-----|-------------------------|-----|------|
     | r              | 0x08          | x   | x                       | x   | p    |
 
-    After each command is sent, the status packet must be read from the read buffer of the Slave by sending the `r 08 x x x p` command. If the packet read is in the format `r 08 01 00 17 p`, the status is set as 'success'; if the packet read is `r 08 01 FF 17 p`, the status is set as 'fail' for the command sent by the I2C Master. See [Figure 1](#figure-1-bridge-control-panel) for more information.
+    After each command is sent, the status packet must be read from the read buffer of the slave by sending the `r 08 x x x p` command. If the packet read is in the format `r 08 01 00 17 p`, the status is set as 'success'; if the packet read is `r 08 01 FF 17 p`, the status is set as 'fail' for the command sent by the I2C master. See Figure 1 for more information.
 
 ## Debugging
 
-You can debug the example to step through the code. In the IDE, use the **\<Application Name> Debug (KitProg3)** configuration in the **Quick Panel**. For more details, see *Program and Debug* section in the Eclipse IDE for ModusToolbox User Guide: *{ModusToolbox install directory}/ide_{version}/docs/mt_ide_user_guide.pdf*.
+You can debug the example to step through the code. In the IDE, use the **\<Application Name> Debug (KitProg3_MiniProg4)** configuration in the **Quick Panel**. For more details, see the "Program and Debug" section in the [Eclipse IDE for ModusToolbox User Guide](https://www.cypress.com/MTBEclipseIDEUserGuide).
+
+**Note:** **(Only while debugging)** On the CM4 CPU, some code in `main()` may execute before the debugger halts at the beginning of `main()`. This means that some code executes twice - once before the debugger stops execution, and again after the debugger resets the program counter to the beginning of `main()`. See [KBA231071](https://community.cypress.com/docs/DOC-21143) to learn about this and for the workaround.
 
 ## Design and Implementation
 
-This example demonstrates the operation of I2C (HAL) resource for PSoC® 6 MCU in Slave mode using callbacks. The I2C Slave is configured with a 3-byte write buffer, which can be accessed by the I2C Master to write commands. In addition, a 3-byte read buffer is configured to read the status of the Slave by the Master. The BCP software is used as the I2C Master.
+This example demonstrates the operation of an I2C (HAL) resource for PSoC 6 MCU in slave mode using callbacks. The I2C slave is configured with a 3-byte write buffer, which can be accessed by the I2C master to write commands. In addition, a 3-byte read buffer is configured to read the status of the slave by the master. The BCP software is used as the I2C master.
 
-The first byte in the write buffer contains the Start of Packet (SoP) value, the next byte contains the LED’s TCPWM compare value, and the third byte in the write buffer is the End of Packet (EoP) value. The Slave updates the Master’s read buffer with the status packet. The first byte of the status packet is SoP, the second byte contains the status where the value 0x00 means success and 0xFF means failure for the command data sent by the Master, and the third byte in the read buffer is EoP.
+The first byte in the write buffer contains the Start of Packet (SoP) value, the next byte contains the LED’s TCPWM compare value, and the third byte in the write buffer is the End of Packet (EoP) value. The slave updates the master’s read buffer with the status packet. The first byte of the status packet is SoP, the second byte contains the status where the value 0x00 means success and 0xFF means failure for the command data sent by the master, and the third byte in the read buffer is EoP.
 
-To control the intensity of the LED, a PWM with a period value of 255 microseconds is used. The duty cycle of the PWM is controlled in firmware and is specified by the I2C Master.
+To control the intensity of the LED, a PWM with a period value of 255 microseconds is used. The duty cycle of the PWM is controlled in firmware and is specified by the I2C master.
 
-In the callback method, data write and read complete events from the Master are handled through interrupts. I2C HAL APIs are used to configure the resource to act as an I2C Slave, and to configure its relevant interrupts to handle data write and read complete events by the Master.
+In the callback method, data write and read complete events from the master are handled through interrupts. I2C HAL APIs are used to configure the resource to act as an I2C slave, and to configure its relevant interrupts to handle data write and read complete events by the master.
 
 ### Resources and Settings
 
-[Table 1](#table-1-application-resources) lists the ModusToolbox resources used in this example, and how they are used in the design.
+**Table 1. Application Resources**
 
-##### Table 1. Application Resources
 | Resource          |  Alias/Object     |    Purpose            |
 | :---------------- | :---------------- | :-------------------- |
 | I2C (HAL)         | i2c_slave         | I2C slave             |
 | TCPWM (PWM) (HAL) | led_pwm           | PWM to drive user LED |
-| GPIO (HAL)        | CYBSP_USER_LED    | User LED              |
+| GPIO (HAL)        | CYBSP_USER_LED    | User LED to show visual output |
+
 
 ## Related Resources
 
@@ -179,16 +206,17 @@ In the callback method, data write and read complete events from the Master are 
 | [CY8CPROTO-063-BLE](https://www.cypress.com/CY8CPROTO-063-BLE) PSoC 6 BLE Prototyping Kit | [CY8CPROTO-062-4343W](https://www.cypress.com/CY8CPROTO-062-4343W) PSoC 6 Wi-Fi BT Prototyping Kit |
 | [CY8CKIT-062S2-43012](https://www.cypress.com/CY8CKIT-062S2-43012) PSoC 62S2 Wi-Fi BT Pioneer Kit | [CY8CPROTO-062S3-4343W](https://www.cypress.com/CY8CPROTO-062S3-4343W) PSoC 62S3 Wi-Fi BT Prototyping Kit |
 | [CYW9P62S1-43438EVB-01](https://www.cypress.com/CYW9P62S1-43438EVB-01) PSoC 62S1 Wi-Fi BT Pioneer Kit | [CYW9P62S1-43012EVB-01](https://www.cypress.com/CYW9P62S1-43012EVB-01) PSoC 62S1 Wi-Fi BT Pioneer Kit |                                                              |
+|[CY8CKIT-064B0S2-4343W](http://www.cypress.com/CY8CKIT-064B0S2-4343W) PSoC 64 Secure Boot Wi-Fi BT Pioneer Kit|  |                                                              |
 | **Libraries**                                                 |                                                              |
-| PSoC 6 Peripheral Driver Library (PDL) and docs                    | [psoc6pdl](https://github.com/cypresssemiconductorco/psoc6pdl) on GitHub |
-| Cypress Hardware Abstraction Layer (HAL) Library and docs          | [psoc6hal](https://github.com/cypresssemiconductorco/psoc6hal) on GitHub |
-| RetargetIO - A utility library to retarget the standard input/output (STDIO) messages to a UART port | [retarget-io](https://github.com/cypresssemiconductorco/retarget-io) on GitHub |
+| PSoC 6 Peripheral Driver Library (PDL) and docs  | [mtb-pdl-cat1](https://github.com/cypresssemiconductorco/mtb-pdl-cat1) on GitHub |
+| Cypress Hardware Abstraction Layer (HAL) Library and docs     | [mtb-hal-cat1](https://github.com/cypresssemiconductorco/mtb-hal-cat1) on GitHub |
+| Retarget IO - A utility library to retarget the standard input/output (STDIO) messages to a UART port | [retarget-io](https://github.com/cypresssemiconductorco/retarget-io) on GitHub |
 | **Middleware**                                               |                                                              |
-| CapSense library and docs                                    | [capsense](https://github.com/cypresssemiconductorco/capsense) on GitHub |
+| CapSense® library and docs                                    | [capsense](https://github.com/cypresssemiconductorco/capsense) on GitHub |
 | Links to all PSoC 6 MCU Middleware                           | [psoc6-middleware](https://github.com/cypresssemiconductorco/psoc6-middleware) on GitHub |
 | **Tools**                                                    |                                                              |
-| [Eclipse IDE for ModusToolbox](https://www.cypress.com/modustoolbox)     | The multi-platform, Eclipse-based Integrated Development Environment (IDE) that supports application configuration and development for PSoC 6 MCU and IoT designers.             |
-| [PSoC Creator](https://www.cypress.com/products/psoc-creator-integrated-design-environment-ide) | The Cypress IDE for PSoC and FM0+ MCU development.            |
+| [Eclipse IDE for ModusToolbox](https://www.cypress.com/modustoolbox)     | The cross-platform, Eclipse-based IDE for IoT designers that supports application configuration and development targeting converged MCU and wireless systems.             |
+| [PSoC Creator™](https://www.cypress.com/products/psoc-creator-integrated-design-environment-ide) | The Cypress IDE for PSoC and FM0+ MCU development.            |
 
 ## Other Resources
 
@@ -198,18 +226,18 @@ For PSoC 6 MCU devices, see [How to Design with PSoC 6 MCU - KBA223067](https://
 
 ## Document History
 
-Document Title: CE221119 - PSoC 6 MCU: I2C Slave using Callbacks
+Document Title: *CE221119 - PSoC 6 MCU: I2C Slave using Callbacks*
 
 | Version | Description of Change |
 | ------- | --------------------- |
 | 1.0.0   | New code example      |
 | 1.1.0   | Updated to support ModusToolbox software v2.1 |
-
+| 2.0.0   | Major update to support ModusToolbox software v2.2, added support for new kits<br> This version is not backward compatible with ModusToolbox software v2.1  |
 ------
 
 All other trademarks or registered trademarks referenced herein are the property of their respective owners.
 
-![Banner](images/Banner.png)
+![banner](images/ifx-cy-banner.png)
 
 -------------------------------------------------------------------------------
 
