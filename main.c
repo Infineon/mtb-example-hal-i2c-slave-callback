@@ -1,28 +1,29 @@
 /******************************************************************************
 * File Name: main.c
 *
-* Description: This is the source code for the PSoC 6 MCU I2C Slave Using
+* Description: This is the source code for MCU I2C Slave Using
 *              Callbacks Example for ModusToolbox.
 
 * Related Document: See Readme.md
 *
 *******************************************************************************
-* (c) 2019-2021, Cypress Semiconductor Corporation. All rights reserved.
-*******************************************************************************
-* This software, including source code, documentation and related materials
-* ("Software"), is owned by Cypress Semiconductor Corporation or one of its
-* subsidiaries ("Cypress") and is protected by and subject to worldwide patent
-* protection (United States and foreign), United States copyright laws and
-* international treaty provisions. Therefore, you may use this Software only
-* as provided in the license agreement accompanying the software package from
-* which you obtained this Software ("EULA").
+* Copyright 2019-2022, Cypress Semiconductor Corporation (an Infineon company) or
+* an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
+* This software, including source code, documentation and related
+* materials ("Software") is owned by Cypress Semiconductor Corporation
+* or one of its affiliates ("Cypress") and is protected by and subject to
+* worldwide patent protection (United States and foreign),
+* United States copyright laws and international treaty provisions.
+* Therefore, you may use this Software only as provided in the license
+* agreement accompanying the software package from which you
+* obtained this Software ("EULA").
 * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
-* non-transferable license to copy, modify, and compile the Software source
-* code solely for use in connection with Cypress's integrated circuit products.
-* Any reproduction, modification, translation, compilation, or representation
-* of this Software except as specified above is prohibited without the express
-* written permission of Cypress.
+* non-transferable license to copy, modify, and compile the Software
+* source code solely for use in connection with Cypress's
+* integrated circuit products.  Any reproduction, modification, translation,
+* compilation, or representation of this Software except as specified
+* above is prohibited without the express written permission of Cypress.
 *
 * Disclaimer: THIS SOFTWARE IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, NONINFRINGEMENT, IMPLIED
@@ -33,9 +34,9 @@
 * not authorize its products for use in any products where a malfunction or
 * failure of the Cypress product may reasonably be expected to result in
 * significant property damage, injury or death ("High Risk Product"). By
-* including Cypress's product in a High Risk Product, the manufacturer of such
-* system or application assumes all risk of such use and in doing so agrees to
-* indemnify Cypress against all liability.
+* including Cypress's product in a High Risk Product, the manufacturer
+* of such system or application assumes all risk of such use and in doing
+* so agrees to indemnify Cypress against all liability.
 *******************************************************************************/
 
 #include "cy_pdl.h"
@@ -219,14 +220,14 @@ void i2c_slave_init(void)
     if (result == CY_RSLT_SUCCESS)
     {
         /* Configure I2C slave write buffer for I2C master to write into */
-        result = cyhal_i2c_slave_config_read_buff(&i2c_slave, i2c_write_buffer,
+        result = cyhal_i2c_slave_config_write_buffer(&i2c_slave, i2c_write_buffer,
                     SL_WR_BUFFER_SIZE);
     }
 
     if (result == CY_RSLT_SUCCESS)
     {
         /* Configure I2C slave read buffer for I2C master to read from */
-        result = cyhal_i2c_slave_config_write_buff(&i2c_slave, i2c_read_buffer,
+        result = cyhal_i2c_slave_config_read_buffer(&i2c_slave, i2c_read_buffer,
                   SL_RD_BUFFER_SIZE);
     }
 
@@ -287,7 +288,7 @@ void handle_i2c_slave_events(void *callback_arg, cyhal_i2c_event_t event)
          }
 
          /* Configure write buffer for the next write */
-         cyhal_i2c_slave_config_read_buff(&i2c_slave, i2c_write_buffer,
+         cyhal_i2c_slave_config_write_buffer(&i2c_slave, i2c_write_buffer,
                                            SL_WR_BUFFER_SIZE);
      }
 
@@ -296,7 +297,7 @@ void handle_i2c_slave_events(void *callback_arg, cyhal_i2c_event_t event)
      {
          /* Configure read buffer for the next read */
          i2c_read_buffer[PACKET_STS_POS] = STS_CMD_FAIL;
-         cyhal_i2c_slave_config_write_buff(&i2c_slave, i2c_read_buffer,
+         cyhal_i2c_slave_config_read_buffer(&i2c_slave, i2c_read_buffer,
                                             SL_RD_BUFFER_SIZE);
      }
 }
