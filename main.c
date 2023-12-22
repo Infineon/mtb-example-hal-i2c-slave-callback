@@ -7,7 +7,7 @@
 * Related Document: See Readme.md
 *
 *******************************************************************************
-* Copyright 2019-2022, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2019-2023, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -39,7 +39,9 @@
 * so agrees to indemnify Cypress against all liability.
 *******************************************************************************/
 
-#include "cy_pdl.h"
+/*******************************************************************************
+* Header Files
+*******************************************************************************/
 #include "cyhal.h"
 #include "cybsp.h"
 
@@ -79,16 +81,15 @@
 #define PACKET_STS_POS          (0x01u)
 #define PACKET_LED_POS          (0x01u)
 #define PACKET_EOP_POS          (0x02u)
+/* PWM macros of different properties */
+#define PWM_CONTINUOUS            true
+#define PWM_ONESHOT               false
+#define PWM_INVERT                true
+#define PWM_NON_INVERT            false
 
-/*******************************************************************************
-* Function Prototypes
-*******************************************************************************/
-void led_pwm_init(void);
-void i2c_slave_init(void);
-void execute_command(void);
-void handle_i2c_slave_events(void *callback_arg, cyhal_i2c_event_t event);
-void handle_error(void);
-
+#ifdef XMC7200D_E272K8384
+#define KIT_XMC72
+#endif
 /*******************************************************************************
 * Global Variables
 *******************************************************************************/
@@ -100,10 +101,29 @@ uint8_t i2c_write_buffer[SL_WR_BUFFER_SIZE];
 
 bool error_detected = false;
 bool led_update_flag = false;
-
+/* PWM configuration variable */
 cyhal_pwm_t led_pwm;
+/* general i2c configuration */
 cyhal_i2c_t i2c_slave;
 cyhal_i2c_cfg_t i2c_slave_cfg = {true, I2C_SLAVE_ADDRESS, I2C_SLAVE_FREQ};
+
+/*******************************************************************************
+* Function Prototypes
+*******************************************************************************/
+/* LED PWM initialization */
+void led_pwm_init(void);
+/* I2C slave initialization */
+void i2c_slave_init(void);
+/* set the PWM LED intensity */
+void execute_command(void);
+/* Process received commands slave interrupt */
+void handle_i2c_slave_events(void *callback_arg, cyhal_i2c_event_t event);
+/* handler for general errors */
+void handle_error(uint32_t status);
+
+/*******************************************************************************
+* Function Definitions
+*******************************************************************************/
 
 /*******************************************************************************
 * Function Name: main
@@ -127,8 +147,26 @@ cyhal_i2c_cfg_t i2c_slave_cfg = {true, I2C_SLAVE_ADDRESS, I2C_SLAVE_FREQ};
 *******************************************************************************/
 int main(void)
 {
+    cy_rslt_t result;
     /* Initialize the device and board peripherals */
-    CY_ASSERT(cybsp_init() == CY_RSLT_SUCCESS);
+    result = cybsp_init();
+    /* Board init failed. Stop program execution */
+    handle_error(result);
+
+#if defined(KIT_XMC72)
+    /*Configure clock settings for KIT_XMC72_EVK */
+    cyhal_clock_t clock_fll, clock_hf, clock_peri;
+    result = cyhal_clock_reserve(&clock_hf, &CYHAL_CLOCK_HF[0]);
+    result = cyhal_clock_reserve(&clock_fll, &CYHAL_CLOCK_FLL);
+    if(result == CY_RSLT_SUCCESS){
+    result = cyhal_clock_set_source(&clock_hf, &clock_fll);
+    }
+    /* Set divider to 1 for Peripheral Clock */
+    result = cyhal_clock_reserve(&clock_peri, CYHAL_CLOCK_PERI);
+    if(result == CY_RSLT_SUCCESS){
+    result = cyhal_clock_set_divider(&clock_peri,1);
+    }
+#endif
 
     /* Initialize the PWM object */
     led_pwm_init();
@@ -142,9 +180,9 @@ int main(void)
     for (;;)
     {
         /* If error is detected in I2C slave operation, handle the error */
-        if (error_detected == true)
+        if (true == error_detected)
         {
-            handle_error();
+            handle_error(1U);
         }
     }
 }
@@ -169,7 +207,8 @@ void led_pwm_init(void)
 
     /* Allocate and initialize a TCPWM resource and auto select a clock */
     result = cyhal_pwm_init_adv(&led_pwm, CYBSP_USER_LED, NC,
-                                CYHAL_PWM_RIGHT_ALIGN, true, 0, false, NULL);
+                                CYHAL_PWM_RIGHT_ALIGN, PWM_CONTINUOUS, 0,
+                                PWM_NON_INVERT, NULL);
 
     if (result == CY_RSLT_SUCCESS)
     {
@@ -185,14 +224,13 @@ void led_pwm_init(void)
     }
 
     /* Handle error if PWM configuration failed */
-    if (result != CY_RSLT_SUCCESS) handle_error();
+    handle_error(result);
  }
-
 
 /*******************************************************************************
 * Function Name: i2c_slave_init
 ********************************************************************************
-*
+* Summary:
 * This function creates and configures an I2C slave object to communicate with
 * I2C master.
 *
@@ -220,8 +258,9 @@ void i2c_slave_init(void)
     if (result == CY_RSLT_SUCCESS)
     {
         /* Configure I2C slave write buffer for I2C master to write into */
-        result = cyhal_i2c_slave_config_write_buffer(&i2c_slave, i2c_write_buffer,
-                    SL_WR_BUFFER_SIZE);
+        result = cyhal_i2c_slave_config_write_buffer(&i2c_slave,
+                                                    i2c_write_buffer,
+                                                    SL_WR_BUFFER_SIZE);
     }
 
     if (result == CY_RSLT_SUCCESS)
@@ -232,7 +271,7 @@ void i2c_slave_init(void)
     }
 
     /* Handle error if I2C slave configuration failed */
-    if (result != CY_RSLT_SUCCESS) handle_error();
+    handle_error(result);
 
     /* Register I2C slave event callback */
     cyhal_i2c_register_callback(&i2c_slave,
@@ -249,7 +288,7 @@ void i2c_slave_init(void)
 /*******************************************************************************
 * Function Name: handle_i2c_slave_events
 ********************************************************************************
-*
+* Summary:
 * Handles slave events write and read completion events.
 *
 * \param callback_arg
@@ -305,7 +344,7 @@ void handle_i2c_slave_events(void *callback_arg, cyhal_i2c_event_t event)
 /*******************************************************************************
 * Function Name: execute_command
 ********************************************************************************
-*
+* Summary:
 * Sets the compare value for the LED PWM received by slave.
 *
 * \param
@@ -325,22 +364,25 @@ void execute_command(void)
 /*******************************************************************************
 * Function Name: handle_error
 ********************************************************************************
-*
+* Summary:
+* User defined error handling function.
 * This function processes unrecoverable errors such as any
 * initialization errors etc. In case of such error the system will
-* stay in the infinite loop of this function.
+* enter into assert.
 *
-* \note
-*  If error occurs interrupts are disabled.
+* Parameters:
+*  uint32_t status - status indicates success or failure
+*
+* Return:
+*  void
 *
 *******************************************************************************/
-void handle_error(void)
+void handle_error(uint32_t status)
 {
-     /* Disable all interrupts. */
-    __disable_irq();
-
-    /* Infinite loop. */
-    while(1u);
+    if (status != CY_RSLT_SUCCESS)
+    {
+        CY_ASSERT(0);
+    }
 }
 
 /* [] END OF FILE */
