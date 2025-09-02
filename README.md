@@ -4,7 +4,7 @@ This code example demonstrates the operation of the I2C (HAL) resource in slave 
 
 [View this README on GitHub.](https://github.com/Infineon/mtb-example-hal-i2c-slave-callback)
 
-[Provide feedback on this code example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMjExMTkiLCJTcGVjIE51bWJlciI6IjAwMi0yMTExOSIsIkRvYyBUaXRsZSI6IkhBTDogSTJDIHNsYXZlIHVzaW5nIGNhbGxiYWNrcyIsInJpZCI6Inlla3QiLCJEb2MgdmVyc2lvbiI6IjMuMy4wIiwiRG9jIExhbmd1YWdlIjoiRW5nbGlzaCIsIkRvYyBEaXZpc2lvbiI6Ik1DRCIsIkRvYyBCVSI6IklDVyIsIkRvYyBGYW1pbHkiOiJQU09DIn0=)
+[Provide feedback on this code example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMjExMTkiLCJTcGVjIE51bWJlciI6IjAwMi0yMTExOSIsIkRvYyBUaXRsZSI6IkhBTDogSTJDIHNsYXZlIHVzaW5nIGNhbGxiYWNrcyIsInJpZCI6Inlla3QiLCJEb2MgdmVyc2lvbiI6IjMuNC4wIiwiRG9jIExhbmd1YWdlIjoiRW5nbGlzaCIsIkRvYyBEaXZpc2lvbiI6Ik1DRCIsIkRvYyBCVSI6IklDVyIsIkRvYyBGYW1pbHkiOiJQU09DIn0=)
 
 ## Requirements
 
@@ -12,9 +12,8 @@ This code example demonstrates the operation of the I2C (HAL) resource in slave 
 - Board Support Package (BSP) minimum required version for:
    - PSoC&trade; 6 MCU: 4.2.0
    - KIT_XMC72_EVK: v2.0.0
-   - CYW920829M2EVK-02: v1.0.1
-   - CYW989829M2EVB-01: v1.0.4
-   - CYW989829M2EVB-03: v1.0.4
+   - CYW920829M2EVK-02: v3.0.0
+   - CYW989829M2EVB-01: v3.0.0
 
 - Programming language: C
 - Associated parts: All [PSoC&trade; 6 MCU](https://www.infineon.com/cms/en/product/microcontroller/32-bit-psoc-arm-cortex-microcontroller/psoc-6-32-bit-arm-cortex-m4-mcu) parts, [XMC7000 MCU](https://www.infineon.com/cms/en/product/microcontroller/32-bit-industrial-microcontroller-based-on-arm-cortex-m/), [AIROC&trade; CYW20829 Bluetooth&reg; LE SoC](https://www.infineon.com/cms/en/product/promopages/airoc20829/), and [AIROC&trade; CYW89829 Bluetooth&reg; LE SoC]
@@ -31,7 +30,7 @@ This code example demonstrates the operation of the I2C (HAL) resource in slave 
 - [PSoC&trade; 62S2 Wi-Fi Bluetooth&reg; Prototyping Kit](https://www.infineon.com/CY8CPROTO-062S2-43439) (`CY8CPROTO-062S2-43439`) – Default value of `TARGET`
 - [PSoC&trade; 6 Wi-Fi Bluetooth&reg; Prototyping Kit](https://www.infineon.com/CY8CPROTO-062-4343W) (`CY8CPROTO-062-4343W`)
 - [AIROC&trade; CYW20829 Bluetooth&reg; LE evaluation Kit](https://www.infineon.com/CYW920829M2EVK-02) (`CYW920829M2EVK-02`)
-- AIROC&trade; CYW89829 Bluetooth&reg; LE evaluation kit (`CYW989829M2EVB-01`, `CYW989829M2EVB-03`)
+- AIROC&trade; CYW89829 Bluetooth&reg; LE evaluation kit (`CYW989829M2EVB-01`)
 - [PSoC&trade; 6 Wi-Fi Bluetooth&reg; Pioneer Kit](https://www.infineon.com/CY8CKIT-062-WIFI-BT) (`CY8CKIT-062-WIFI-BT`)
 - [PSoC&trade; 6 Bluetooth&reg; LE Pioneer Kit](https://www.infineon.com/CY8CKIT-062-BLE) (`CY8CKIT-062-BLE`)
 - [PSoC&trade; 6 Bluetooth&reg; LE Prototyping Kit](https://www.infineon.com/CY8CPROTO-063-BLE) (`CY8CPROTO-063-BLE`)
@@ -345,6 +344,7 @@ Document title: *CE221119* - *HAL: I2C slave using callbacks*
  3.1.0   | Added support for KIT_XMC71_EVK_LITE_V1 and KIT-CYW920829M2EVK-02 <br> Updated to support ModusToolbox&trade; v3.1.
  3.2.0   | Added support for CYW989829M2EVB-01
  3.3.0   | Added support for CYW989829M2EVB-03
+ 3.4.0   | Remove support for CYW989829M2EVB-03
 <br>
 All referenced product or service names and trademarks are the property of their respective owners.
 
